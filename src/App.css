@@ -1,0 +1,165 @@
+/* Home Component */
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block;}audio,canvas,video{display:inline-block;}audio:not([controls]){display:none;height:0;}[hidden]{display:none;}html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;}body{margin:0;}a:focus{outline:thin dotted;}a:active,a:hover{outline:0;}h1{font-size:2em;margin:0.67em 0;}abbr[title]{border-bottom:1px dotted;}b,strong{font-weight:bold;}dfn{font-style:italic;}hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0;}mark{background:#ff0;color:#000;}code,kbd,pre,samp{font-family:monospace,serif;font-size:1em;}pre{white-space:pre-wrap;}q{quotes:"\201C" "\201D" "\2018" "\2019";}small{font-size:80%;}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline;}sup{top:-0.5em;}sub{bottom:-0.25em;}img{border:0;}svg:not(:root){overflow:hidden;}figure{margin:0;}fieldset{border:1px solid #c0c0c0;margin:0 2px;padding:0.35em 0.625em 0.75em;}legend{border:0;padding:0;}button,input,select,textarea{font-family:inherit;font-size:100%;margin:0;}button,input{line-height:normal;}button,select{text-transform:none;}button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer;}button[disabled],html input[disabled]{cursor:default;}input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0;}input[type="search"]{-webkit-appearance:textfield;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box;}input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-decoration{-webkit-appearance:none;}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0;}textarea{overflow:auto;vertical-align:top;}table{border-collapse:collapse;border-spacing:0;}
+
+*,
+*::after,
+*::before {
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: 'Oswald', sans-serif;
+	color: #909090;
+	background: #1c1c1c;
+}
+
+a {
+	text-decoration: none;
+	color: #909090;
+	outline: none;
+}
+
+a:hover,
+a:focus, .fa {
+	color: #fff;
+}
+
+
+/* Header */
+
+.codrops-header {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	width: 100%;
+	padding: 1em;
+	z-index: 100;
+}
+
+.codrops-header__title {
+	font-size: 1em;
+	font-weight: 400;
+	margin: 0;
+	padding: 0 1em 0 0.25em;
+	color: #fff;
+
+}
+
+
+/* Top Navigation Style */
+
+.codrops-links {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	text-align: center;
+	white-space: nowrap;
+	font-size: 0.85em;
+}
+
+.codrops-links::after {
+	content: '';
+	height: 100%;
+	width: 1px;
+	background: currentColor;
+	position: absolute;
+	transform: rotate(22.5deg);
+	left: 50%;
+	top: 0;
+}
+
+
+
+.demo-grid {
+	--body-text: #585858;
+	--body-text-alt: #cf1d56;
+	--body-bg: #010101;
+	--link-text: #c7c5c5;
+	--link-text-hover: #fff;
+	--content-font: "Cormorant Garamond", sans-serif;
+}
+
+.content {
+	--pieces-height: 90vh;
+	height: 100vh;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.page-nav {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	font-family: var(--content-font);
+}
+
+.page-nav__item {
+	font-size: 10vh;
+}
+
+.page-nav__item--close {
+	font-size: 1.85em;
+	margin: 1em 0 0 0;
+	color: var(--body-text-alt);
+	position: relative;
+}
+
+.page-nav__item--close:hover,
+.page-nav__item--close:focus {
+	color: var(--body-text-alt);
+	text-decoration: line-through;
+}
+
+.content__title {
+	font-size: 10vw;
+	margin: 0;
+	font-weight: normal;
+	cursor: pointer;
+	font-family: var(--content-font);
+	color: var(--body-text-alt);
+	position: relative;
+}
+
+.page-nav--open ~ .content__title {
+	pointer-events: none;
+}
+
+.content .pieces {
+	height: 90vh;
+	width: calc(var(--pieces-height) * calc(888/1000));
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: calc(-1 * var(--pieces-height) * calc(888/1000) / 2);
+	margin-top: calc(-1 * var(--pieces-height) / 2);
+  pointer-events: none;
+  background-position: center;
+  background-size: cover;
+}
+
+@media screen and (max-width: 40em) {
+	.content {
+		--pieces-height: 50vh;
+		height: var(--pieces-height);
+		margin-bottom: 8em;
+	}
+	.content__title {
+		font-size: 22vw;
+	}
+	.page-nav__item {
+		font-size: 6vh;
+	}
+}
