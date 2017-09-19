@@ -42,7 +42,7 @@ export default class Portfolio extends Component {
 
     render() {
         const portfolio_styles = {
-            paddingTop: '100px'
+            paddingTop: '150px'
         }
   
         const Grid = measureItems(CSSGrid, {measureImages: true});
@@ -66,7 +66,7 @@ export default class Portfolio extends Component {
                         
                          {this.props.videos.map((video) => (
                             <div className="portfolio_grid__item">    
-                                <img className="portfolio_grid__img" src={video.pictures.sizes[2].link} />
+                                <img className="portfolio_grid__img" src={video.pictures ? video.pictures.sizes[2].link : null} />
                             </div>
                          )
                          )}
