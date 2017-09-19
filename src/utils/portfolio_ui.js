@@ -1,12 +1,10 @@
-import React, { Component } from 'react'
 import imagesLoaded from 'react-images-loaded'
 import anime from 'animejs'
 import scrollMonitor from 'scrollmonitor'
 
-import '../css/Portfolio.css'
-// import '../utils/portfolio_ui'
 
 
+{
 	// Helper vars and functions.
 	const extend = function(a, b) {
 		for( let key in b ) { 
@@ -107,7 +105,13 @@ import '../css/Portfolio.css'
 		this.DOM.title.style.WebkitTransform = this.DOM.title.style.transform = 'translateX(' + transforms.title.x + 'px) translateY(' + transforms.title.y + 'px)';
 	};
 
-	
+	const DOM = {};
+	DOM.svg = document.querySelector('.morph');
+	DOM.shapeEl = DOM.svg.querySelector('path');
+	DOM.contentElems = Array.from(document.querySelectorAll('.content-wrap'));
+	DOM.contentLinks = Array.from(document.querySelectorAll('.content__link'));
+	DOM.footer = document.querySelector('.content--related');
+	const contentElemsTotal = DOM.contentElems.length;
 	const shapes = [
 		{
 			path: 'M 262.9,252.2 C 210.1,338.2 212.6,487.6 288.8,553.9 372.2,626.5 511.2,517.8 620.3,536.3 750.6,558.4 860.3,723 987.3,686.5 1089,657.3 1168,534.7 1173,429.2 1178,313.7 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
@@ -257,53 +261,50 @@ import '../css/Portfolio.css'
 	];
 	let step;
 
-
-    
-
-        
-
-	
-
-	
-
-
-export default class Portfolio extends Component {
-    constructor(props) {
-        super(props)
-
-        this.state = {
-            videos: []
-        }
-        const DOM = {};
-        DOM.svg = document.querySelector('.morph');
-        DOM.shapeEl = document.querySelector('.morph_path');
-        DOM.contentElems = Array.from(document.querySelectorAll('.content-wrap'));
-        DOM.contentLinks = Array.from(document.querySelectorAll('.content__link'));
-        DOM.footer = document.querySelector('.content--related');
-        const contentElemsTotal = DOM.contentElems.length;
-    }
-    componentDidMount() {
-        new imagesLoaded(document.body, () => {
-			this.initShapeEl()
-			this.createScrollWatchers()
-			Array.from(document.querySelectorAll('.content--layout')).forEach(el => new TiltObj(el));
-			// Remove loading class from body
-			
+	const initShapeLoop = function(pos) {
+		pos = pos || 0;
+		anime.remove(DOM.shapeEl);
+		anime({
+			targets: DOM.shapeEl,
+			easing: 'linear',
+			d: [{value: shapes[pos].pathAlt, duration:1500}, {value: shapes[pos].path, duration:1500}],
+			loop: true,
+			fill: {
+				value: shapes[pos].fill.color,
+				duration: shapes[pos].fill.duration,
+				easing: shapes[pos].fill.easing
+			},
+			direction: 'alternate'
 		});
-        console.log(localStorage.getItem('videos'))
-        // this.setState({videos: JSON.parse(localStorage.getItem('videos'))})   
-    }
-    createScrollWatchers() {
-		this.DOM.contentElems.forEach((el,pos) => {
-			const scrollElemToWatch = pos ? this.DOM.contentElems[pos] : this.DOM.footer;
-			pos = pos ? pos : this.contentElemsTotal;
+	};
+
+	const initShapeEl = function() {
+		anime.remove(DOM.svg);
+		anime({
+			targets: DOM.svg,
+			duration: 1,
+			easing: 'linear',
+			scaleX: shapes[0].scaleX,
+			scaleY: shapes[0].scaleY,
+			translateX: shapes[0].tx+'px',
+			translateY: shapes[0].ty+'px',
+			rotate: shapes[0].rotate+'deg'
+		});
+
+		initShapeLoop();
+	};
+
+	const createScrollWatchers = function() {
+		DOM.contentElems.forEach((el,pos) => {
+			const scrollElemToWatch = pos ? DOM.contentElems[pos] : DOM.footer;
+			pos = pos ? pos : contentElemsTotal;
 			const watcher = scrollMonitor.create(scrollElemToWatch,-350);
 			
 			watcher.enterViewport(function() {
 				step = pos;
-				anime.remove(this.DOM.shapeEl);
+				anime.remove(DOM.shapeEl);
 				anime({
-					targets: this.DOM.shapeEl,
+					targets: DOM.shapeEl,
 					duration: shapes[pos].animation.path.duration,
 					easing: shapes[pos].animation.path.easing,
 					elasticity: shapes[pos].animation.path.elasticity || 0,
@@ -314,13 +315,13 @@ export default class Portfolio extends Component {
 						easing: shapes[pos].fill.easing
 					},
 					complete: function() {
-						this.initShapeLoop(pos);
+						initShapeLoop(pos);
 					}
 				});
 
-				anime.remove(this.DOM.svg);
+				anime.remove(DOM.svg);
 				anime({
-					targets: this.DOM.svg,
+					targets: DOM.svg,
 					duration: shapes[pos].animation.svg.duration,
 					easing: shapes[pos].animation.svg.easing,
 					elasticity: shapes[pos].animation.svg.elasticity || 0,
@@ -335,11 +336,11 @@ export default class Portfolio extends Component {
 			watcher.exitViewport(function() {
 				const idx = !watcher.isAboveViewport ? pos-1 : pos+1;
 
-				if( idx <= this.contentElemsTotal && step !== idx ) {
+				if( idx <= contentElemsTotal && step !== idx ) {
 					step = idx;
-					anime.remove(this.DOM.shapeEl);
+					anime.remove(DOM.shapeEl);
 					anime({
-						targets: this.DOM.shapeEl,
+						targets: DOM.shapeEl,
 						duration: shapes[idx].animation.path.duration,
 						easing: shapes[idx].animation.path.easing,
 						elasticity: shapes[idx].animation.path.elasticity || 0,
@@ -350,13 +351,13 @@ export default class Portfolio extends Component {
 							easing: shapes[idx].fill.easing
 						},
 						complete: function() {
-							this.initShapeLoop(idx);
+							initShapeLoop(idx);
 						}
 					});
 
-					anime.remove(this.DOM.svg);
+					anime.remove(DOM.svg);
 					anime({
-						targets: this.DOM.svg,
+						targets: DOM.svg,
 						duration: shapes[idx].animation.svg.duration,
 						easing: shapes[idx].animation.svg.easing,
 						elasticity: shapes[idx].animation.svg.elasticity || 0,
@@ -369,85 +370,18 @@ export default class Portfolio extends Component {
 				}
 			});
 		});
-    }
-  
+	};
 
-    initShapeLoop(pos) {
-		pos = pos || 0;
-		anime.remove(this.DOM.shapeEl);
-		anime({
-			targets: this.DOM.shapeEl,
-			easing: 'linear',
-			d: [{value: shapes[pos].pathAlt, duration:1500}, {value: shapes[pos].path, duration:1500}],
-			loop: true,
-			fill: {
-				value: shapes[pos].fill.color,
-				duration: shapes[pos].fill.duration,
-				easing: shapes[pos].fill.easing
-			},
-			direction: 'alternate'
+	const init = function() {
+		imagesLoaded(document.body, () => {
+			initShapeEl();
+			createScrollWatchers();
+			Array.from(document.querySelectorAll('.content--layout')).forEach(el => new TiltObj(el));
+			// Remove loading class from body
+			document.body.classList.remove('loading');
 		});
-    }
-    initShapeEl() {
-		anime.remove(this.DOM.svg);
-		anime({
-			targets: this.DOM.svg,
-			duration: 1,
-			easing: 'linear',
-			scaleX: shapes[0].scaleX,
-			scaleY: shapes[0].scaleY,
-			translateX: shapes[0].tx+'px',
-			translateY: shapes[0].ty+'px',
-			rotate: shapes[0].rotate+'deg'
-		});
-
-		this.initShapeLoop()
 	}
-    componentWillMount() {
-        
 
-    }
-   
-  
+	init();
+};
 
-    render() {
-        const portfolio_styles = {
-            paddingTop: '100px'
-        }
-        const items = [1,2,3,4]
-        const i = () => {items[Math.floor(Math.random()*items.length)]}
-        const layout =`content content--layout content--layout-${items[Math.floor(Math.random()*items.length)]}`
-        console.log(layout)
-      
-  
-            
-            return (
-                <div className="Portfolio demo-2" style={portfolio_styles}>
-                    <main>
-                    <div className="morph-wrap">
-                        <svg className="morph" width="1400" height="770" viewBox="0 0 1400 770">
-                            <path className="morph_path" d="M 262.9,252.2 C 210.1,338.2 212.6,487.6 288.8,553.9 372.2,626.5 511.2,517.8 620.3,536.3 750.6,558.4 860.3,723 987.3,686.5 1089,657.3 1168,534.7 1173,429.2 1178,313.7 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z"/>
-                        </svg>
-                    </div>
-                        {this.props.videos.map((video) => (
-                            <div className="content-wrap">
-                                <div className={layout}>
-                                    <div className='content__img'>
-                                        <img src={video.pictures ? video.pictures.sizes[2].link : null} />
-                                    </div>
-                                    
-                                    <h3 className="content__title">found</h3>
-                                    <p className="content__author">Jane Westhall</p>
-                                    <p className="content__desc">Lost or found? That's the question today.</p>
-                                    <a href="#" className="content__link">Discover</a>
-                                </div>
-                            </div>
-                        ))}
-                    </main>
-                </div>
-    
-            )
-        } 
-       
-    
-}

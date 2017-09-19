@@ -15,6 +15,7 @@
     "react-player": "^0.24.4",
     "react-router-dom": "^4.2.2",
     "react-stonecutter": "^0.3.7",
+    "scrollmonitor": "^1.2.3",
     "three": "^0.87.1",
     "vimeo": "^1.2.1"
   },

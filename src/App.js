@@ -29,15 +29,18 @@ class App extends Component {
   componentWillMount() {
     const lib = new Vimeo(clientID, clientSecret, accessToken);
     let videos = [];
+    const isPublic = (video) => video.privacy.view != 'nobody' && video.privacy.view != 'password'
 
     lib.request({
         path: '/me/videos'
     }, (err, body, status_code, headers) => {
         if (!err) {
-            videos = body.data;
-            localStorage.setItem('videos', JSON.stringify(videos))
+            videos = body.data.filter((video) => isPublic(video))
+            console.log(videos)
+
+            // localStorage.setItem('videos', JSON.stringify(videos))
             this.setState({ videos: videos })
-            console.log(videos);
+            
         } else {
             console.log(err);
         }

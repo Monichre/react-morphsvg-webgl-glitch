@@ -128,8 +128,6 @@ class Letter {
         };
         this.DOM.letter.addEventListener('mouseenter', this.mouseenterFn);
         this.DOM.letter.addEventListener('mouseleave', this.mouseleaveFn);
-        this.DOM.letter.addEventListener('touchstart', this.mouseenterFn);
-        this.DOM.letter.addEventListener('touchend', this.mouseleaveFn);
     }
 }
 
