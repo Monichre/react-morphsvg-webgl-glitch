@@ -1,5 +1,5 @@
 
-.FeaturedVideo {
+.About {
 	height: 100vh;
 	position: relative;
 }
@@ -41,14 +41,14 @@ a:focus {
 	margin: 0 0 0 215px;
 }
 
-.FeaturedVideo .content {
+.About .content {
 	z-index: 1;
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
 	height: 100%;
 	padding: 25px 50px;
-	background: url(img/bg_lavender.jpg) no-repeat top left;
+	background: url(../img/bg_lavender.jpg) no-repeat top left;
 	background-size: auto 100%;
 }
 
@@ -61,7 +61,7 @@ a:focus {
 }
 
 /* Header */
-.FeaturedVideo .codrops-header {
+.About .codrops-header {
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -70,7 +70,7 @@ a:focus {
 	text-align: right;
 }
 
-.FeaturedVideo .codrops-header__info {
+.About .codrops-header__info {
 	font-family: 'Fjalla One', sans-serif;
 	font-size: 5em;
 	font-weight: 700;
@@ -81,7 +81,7 @@ a:focus {
 	text-align: right;
 }
 
-.FeaturedVideo .codrops-header__info::after {
+.About .codrops-header__info::after {
 	content: '01';
 	font-family: 'Avenir Next', Avenir, Helvetica, Arial, sans-serif;
 	font-size: 8em;
@@ -95,7 +95,7 @@ a:focus {
 	color: #fff;
 }
 
-.FeaturedVideo .codrops-header__deco {
+.About .codrops-header__deco {
 	font-size: 2em;
 	line-height: 1;
 	padding: 1em 0;
@@ -104,21 +104,21 @@ a:focus {
 	writing-mode: vertical-rl;
 }
 
-.FeaturedVideo .codrops-header__title {
+.About .codrops-header__title {
 	font-size: 8.5em;
 	line-height: 0.8;
 	margin: 0 -7px 0;
 	padding: 0;
 }
 
-.FeaturedVideo .codrops-header__tagline {
+.About .codrops-header__tagline {
 	width: 50%;
 	margin: 0 0 0 auto;
 	padding: 0;
 }
 
 /* Top Navigation Style */
-.FeaturedVideo .codrops-links {
+.About .codrops-links {
 	position: relative;
 	display: flex;
 	justify-content: space-between;
@@ -332,41 +332,41 @@ a:focus {
 }
 
 /* Individual demos */
-.demo-2 {
+.About {
 	background: #fff4d7;
 }
 
-.demo-2 .view {
+.About .view {
 	margin-left: 150px;
 }
 
-.demo-2 .content {
-	background-image: url(img/bg_yellow.jpg);
+.About .content {
+	background-image: url(../img/bg_yellow.jpg);
 }
 
-.demo-2 .codrops-header__info::after {
+.About .codrops-header__info::after {
 	content: "'17";
 	color: #fff;
 	font-size: 7em;
 }
 
-.demo-2 .codrops-header__deco,
-.demo-2 a:hover,
-.demo-2 a:focus {
+.About .codrops-header__deco,
+.About a:hover,
+.About a:focus {
 	color: #ff764b;
 }
 
-.demo-2 .deco__text,
-.demo-2 .demos__text {
+.About .deco__text,
+.About .demos__text {
 	color: #333;
 	font-family: 'Fjalla One', sans-serif;
 }
 
-.demo-2 .demo--current::before {
+.About .demo--current::before {
 	background: #ff764b;
 }
 
-.demo-2 .btn--back {
+.About .btn--back {
 	color: #ff764b;
 }
 
@@ -445,17 +445,17 @@ a:focus {
 	color: #fff;
 }
 
-.tabscontent__item:first-child .box {
-	background-image: url(../img/about/portrait1.jpg);
+/* .tabscontent__item:first-child .box {
+	background-image: url(../../img/portrait1.jpg);
 }
 
 .tabscontent__item:nth-child(2) .box {
-	background-image: url(../img/about/portrait2.jpg);
+	background-image: url(../../img/portrait2.jpg);
 }
 
 .tabscontent__item:nth-child(3) .box {
-	background-image: url(../img/about/portrait3.jpg);
-}
+	background-image: url(../../img/portrait3.jpg);
+} */
 
 @media screen and (max-width: 40em) {
 	.view {
@@ -525,11 +525,11 @@ a:focus {
 	.btn--menu {
 		display: block;
 	}
-	.demo-2 .btn--menu {
+	.About .btn--menu {
 		position: relative;
 		margin: 0 2em 0 0;
 	}
-	.demo-2 .tabscontent__item {
+	.About .tabscontent__item {
 		font-size: 0.575em;
 		flex-direction: column;
 	}

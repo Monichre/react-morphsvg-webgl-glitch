@@ -732,7 +732,7 @@ a:focus {
 	width: 100%;
 }
 
-.content__title {
+#Portfolio .content__title {
 	grid-area: title;
 	font-family: 'nexa_boldregular', sans-serif;
 	letter-spacing: -0.025em;
