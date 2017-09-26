@@ -25,18 +25,12 @@ export default class Header extends Component {
                 </svg>
                 <header className="codrops-header">
                     <div className="codrops-links">
-                        <a className="codrops-icon codrops-icon--prev" href="/" title=""><svg className="icon icon--arrow"><use xlinkHref="#icon-arrow"></use></svg></a>
-                        
+                        <a className="codrops-icon codrops-icon--prev" href="/" title="">
+                            <h1 className="codrops-header__title">JUD NICHOLS</h1>
+                        </a>
                     </div>
-                    <h1 className="codrops-header__title">JUD NICHOLS</h1>
-                   
-                </header >
-                
-                <p className="codrops-header__tagline">
-                    <a className="github" href="" title="Find this project on GitHub"><svg className="icon icon--github"><use xlinkHref="#icon-github"></use></svg></a>
-                    Cutting Edge Cinematography</p>
-
-                
+                    
+                </header >  
             </div>
 
         )

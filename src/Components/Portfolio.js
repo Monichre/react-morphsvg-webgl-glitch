@@ -4,450 +4,427 @@ import anime from 'animejs'
 import scrollMonitor from 'scrollmonitor'
 
 import '../css/Portfolio.css'
-// import '../utils/portfolio_ui'
 
 
-	// Helper vars and functions.
-	const extend = function(a, b) {
-		for( let key in b ) { 
-			if( b.hasOwnProperty( key ) ) {
-				a[key] = b[key];
+
+const getMousePos = (e) => {
+	let posx = 0;
+	let posy = 0;
+	if (!e) { let e = window.event };
+	if (e.pageX || e.pageY) {
+		posx = e.pageX;
+		posy = e.pageY;
+	}
+	else if (e.clientX || e.clientY) {
+		posx = e.clientX + document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+		posy = e.clientY + document.body.scrollTop
+			+ document.documentElement.scrollTop;
+	}
+	return {
+		x: posx,
+		y: posy
+	};
+}
+
+
+const debounce = (func, wait, immediate) => {
+	let timeout;
+	return () => {
+		let context = this, args = arguments;
+		let later = () => {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		let callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
+const distance = (x1, x2, y1, y2) => {
+	const a = x1 - x2;
+	const b = y1 - y2;
+	return Math.sqrt(a * a + b * b);
+};
+
+let win = { width: window.innerWidth, height: window.innerHeight };
+let center = { x: win.width / 2, y: win.height / 2 };
+
+class GridItem {
+	constructor(el, options) {
+		this.CONFIG = {
+			filledColor: '#fff'
+		};
+		Object.assign(this.CONFIG, options);
+		this.DOM = {};
+		this.DOM.el = el;
+		const bcr = this.DOM.el.getBoundingClientRect();
+		this.itemCenter = {
+			x: bcr.left + bcr.width / 2,
+			y: bcr.top + bcr.height / 2
+		};
+		this.revealer = new Revealer(this.DOM.el, { color: this.CONFIG.filledColor || window.getComputedStyle(document.body, null).backgroundColor });
+		this.initEvents();
+	}
+	initEvents() {
+		window.addEventListener('resize', (ev) => debounce(this.onresize()));
+	}
+	onresize(ev) {
+		const bcr = this.DOM.el.getBoundingClientRect();
+		this.itemCenter = {
+			x: bcr.left + bcr.width / 2,
+			y: bcr.top + bcr.height / 2
+		};
+	}
+	show(animation = true) {
+		return animation ? this.revealer.show({ direction: this.DOM.el.dataset.direction || 'rtl', delay: this.DOM.el.dataset.delay || 0 }) : this.revealer.show();
+	}
+	hide(animation = true) {
+		return animation ? this.revealer.hide({ direction: this.DOM.el.dataset.direction || 'rtl', delay: this.DOM.el.dataset.delay || 0 }) : this.revealer.hide();
+	}
+	showFilled() {
+		return this.revealer.showFilled({ direction: this.DOM.el.dataset.direction || 'rtl', delay: this.DOM.el.dataset.delay || 0 });
+	}
+	hideFilled() {
+		return this.revealer.hideFilled({ direction: this.DOM.el.dataset.direction || 'rtl', delay: this.DOM.el.dataset.delay || 0 });
+	}
+	setTransform(transform) {
+		const dist = distance(this.itemCenter.x, this.itemCenter.y, center.x, center.y);
+		const tx = transform.translateX / win.width * dist || 0;
+		const ty = transform.translateY / win.height * dist || 0;
+		this.DOM.el.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+	}
+	isNavCtrl() {
+		return this.DOM.el.classList.contains('grid__item--nav');
+	}
+}
+
+class Grid {
+	constructor(el, options) {
+		this.CONFIG = {
+			filledColor: '#fff'
+		};
+		Object.assign(this.CONFIG, options);
+		this.DOM = {};
+		this.DOM.el = el;
+		this.DOM.items = Array.from(this.DOM.el.querySelectorAll('div.grid__item'));
+		this.DOM.name = this.DOM.el.querySelector('.grid__item--name');
+		this.DOM.title = this.DOM.el.querySelector('.grid__item--title');
+		this.DOM.text = this.DOM.el.querySelector('.grid__item--text');
+		this.textElems = [this.DOM.name, this.DOM.title, this.DOM.text];
+		this.layout();
+	}
+	layout() {
+		this.itemsTotal = this.DOM.items.length;
+		this.items = [];
+		this.DOM.items.forEach((item) => this.items.push(new GridItem(item, { filledColor: this.CONFIG.filledColor })));
+	}
+	show(filled = false, animation = true) {
+		return new Promise((resolve, reject) => {
+			this.DOM.el.classList.add('grid--animating');
+			this.hideItems();
+
+			this.DOM.el.classList.add('grid--current');
+			const promises = [];
+			for (let i = 0; i < this.itemsTotal; i++) {
+				const promise = filled ? this.items[i].showFilled() : this.items[i].show(animation);
+				promises.push(promise);
+			};
+			for (let i = 0, len = this.textElems.length; i < len; i++) {
+				const promise = this.animateText(this.textElems[i], 'In');
+				promises.push(promise);
+			};
+			Promise.all(promises).then(() => {
+				this.resetTextClasses('In');
+				this.DOM.el.classList.remove('grid--animating');
+				resolve()
+			});
+		});
+	}
+	hide(filled = false, animation = true) {
+		return new Promise((resolve, reject) => {
+			this.DOM.el.classList.add('grid--animating');
+			const promises = [];
+			for (let i = 0; i < this.itemsTotal; i++) {
+				const promise = filled ? this.items[i].hideFilled() : this.items[i].hide(animation);
+				promises.push(promise);
+			};
+			for (let i = 0, len = this.textElems.length; i < len; i++) {
+				const promise = this.animateText(this.textElems[i], 'Out');
+				promises.push(promise);
+			};
+			Promise.all(promises).then(() => {
+				this.resetTextClasses('Out');
+				this.DOM.el.classList.remove('grid--animating');
+				this.DOM.el.classList.remove('grid--current');
+				resolve();
+			});
+		});
+	}
+	animateText(el, dir) {
+		return new Promise((resolve, reject) => {
+			el.classList.add(`grid__item--animate${dir}`);
+			el.addEventListener('animationend', resolve);
+		});
+	}
+	resetTextClasses(dir) {
+		for (let i = 0, len = this.textElems.length; i < len; i++) {
+			this.textElems[i].classList.remove(`grid__item--animate${dir}`);
+		};
+	}
+	hideItems() {
+		for (let i = 0; i < this.itemsTotal; i++) {
+			this.items[i].hide(false);
+		};
+	}
+	tilt(transform) {
+		for (let i = 0; i < this.itemsTotal; i++) {
+			const item = this.items[i];
+			if (!item.isNavCtrl()) {
+				item.setTransform(transform);
+			}
+		};
+	}
+};
+
+class Slideshow {
+	constructor(grids, options) {
+		this.CONFIG = {
+			filledColor: false, // false || colorvalue (e.g. '#666')
+			hasTilt: false,
+			tilt: { maxTranslationX: 50, maxTranslationY: 50 }
+		};
+		Object.assign(this.CONFIG, options);
+		this.DOM = {};
+		this.DOM.grids = grids;
+		this.init();
+	}
+	init() {
+		this.current = 0;
+		this.gridsTotal = this.DOM.grids.length;
+		this.grids = [];
+		this.DOM.grids.forEach((grid) => this.grids.push(new Grid(grid, {
+			filledColor: this.CONFIG.filledColor
+		})));
+		this.initEvents();
+	}
+	initEvents() {
+		Array.from(document.querySelectorAll('.grid__item--nav-next')).forEach((ctrl) => ctrl.addEventListener('click', (ev) => this.navigate(ev, 'next')));
+		Array.from(document.querySelectorAll('.grid__item--nav-prev')).forEach((ctrl) => ctrl.addEventListener('click', (ev) => this.navigate(ev, 'prev')))
+		if (this.CONFIG.hasTilt) {
+			document.addEventListener('mousemove', (ev) => this.onmousemove(ev));
+			window.addEventListener('resize', (ev) => debounce(this.onresize()));
+		}
+	}
+	onmousemove(ev) {
+		requestAnimationFrame(() => {
+			const mousepos = getMousePos(ev);
+			const transX = 2 * this.CONFIG.tilt.maxTranslationX / win.width * mousepos.x - this.CONFIG.tilt.maxTranslationX;
+			const transY = 2 * this.CONFIG.tilt.maxTranslationY / win.height * mousepos.y - this.CONFIG.tilt.maxTranslationY;
+			this.grids[this.current].tilt({ translateX: transX, translateY: transY });
+		});
+	}
+	onresize(ev) {
+		win = { width: window.innerWidth, height: window.innerHeight };
+		center = { x: win.width / 2, y: win.height / 2 };
+	}
+	navigate(ev, direction) {
+		if (this.isAnimating) {
+			return false;
+		}
+		this.isAnimating = true;
+		const currentGrid = this.grids[this.current];
+		this.current = direction === 'next' ? (this.current < this.gridsTotal - 1 ? this.current + 1 : 0) : (this.current > 0 ? this.current - 1 : this.gridsTotal - 1);
+		const nextGrid = this.grids[this.current];
+		const filled = this.CONFIG.filledColor;
+		currentGrid.hide(!!filled).then(() => {
+			nextGrid.show(!!filled).then(() => this.isAnimating = false);
+			if (this.CONFIG.hasTilt) {
+				this.onmousemove(ev);
+			}
+		});
+	}
+}
+
+class Revealer {
+		constructor(el, options) {
+			this.CONFIG = {
+				hidden: false,
+				color: '#fff'
+			};
+			Object.assign(this.CONFIG, options);
+
+			this.DOM = {};
+			this.DOM.item = el;
+			this.layout();
+		}
+		layout() {
+			this.allClasses = ['revealer--visible','revealer--right','revealer--left','revealer--top','revealer--bottom','revealer--showX','revealer--showY','revealer--hideX','revealer--hideY'];
+
+			this.revealerEl = document.createElement('div');
+			this.revealerEl.className = 'revealer';
+			this.revealerEl.style.backgroundColor = this.CONFIG.color;
+			this.DOM.item.appendChild(this.revealerEl);
+
+			if ( this.CONFIG.hidden ) {
+				this.revealerEl.classList.add('revealer--visible');
 			}
 		}
-		return a;
-	};
-
-	// from http://www.quirksmode.org/js/events_properties.html#position
-	const getMousePos = function(ev) {
-		let posx = 0;
-		let posy = 0;
-		if (!ev) ev = window.event;
-		if (ev.pageX || ev.pageY) 	{
-			posx = ev.pageX;
-			posy = ev.pageY;
+		show(animation) {
+			return this.toggle(animation, 'show');
 		}
-		else if (ev.clientX || ev.clientY) 	{
-			posx = ev.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-			posy = ev.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+		hide(animation) {
+			return this.toggle(animation, 'hide');
 		}
-		return { x : posx, y : posy };
-	};
+		toggle(animationOpts, action) {
+			return new Promise((resolve, reject) => {
+				if ( animationOpts ) {
+					this.animate(animationOpts, action);
+					this.revealerEl.addEventListener('animationend', resolve);
+				}
+				else {
+					this.revealerEl.classList.remove(...this.allClasses);
+					this.revealerEl.classList.add('revealer--visible');
+					resolve();
+				}
+			});
+		}
+		showFilled(animation) {
+			return new Promise((resolve, reject) => {
+				this.hide();
+				animation.target = this.DOM.item;
+				animation.target.style.visibility = 'hidden';
+				this.animate(animation, 'hide');
 
-	const TiltObj = function(el, options) {
-		this.el = el;
-		this.options = extend({}, this.options);
-		extend(this.options, options);
-		this.DOM = {};
-		this.DOM.img = this.el.querySelector('.content__img');
-		this.DOM.title = this.el.querySelector('.content__title');
-		this._initEvents();
+				let completefn = () => {
+					animation.target.removeEventListener('animationend', completefn);
+					animation.target = this.revealerEl;
+					this.animate(animation, 'show');
+					animation.target.addEventListener('animationend', (ev) => {
+						if ( ev.target === animation.target ) {
+							resolve();
+						}
+					});
+				};
+				animation.target.addEventListener('animationend', completefn);
+			});
+		}
+		hideFilled(animation) {
+			return new Promise((resolve, reject) => {
+				this.animate(animation, 'hide');
+
+				let completefn = () => {
+					this.revealerEl.removeEventListener('animationend', completefn);
+					animation.target = this.DOM.item;
+					this.animate(animation, 'show');
+					animation.target.addEventListener('animationend', (ev) => {
+						if ( ev.target === animation.target ) {
+							resolve();
+						}
+					});
+				};
+				this.revealerEl.addEventListener('animationend', completefn);
+			});
+		}
+		animate(animationOpts, action) {
+			setTimeout(() => {
+				const target = animationOpts.target || this.revealerEl;
+				target.style.visibility = 'visible';
+				target.classList.remove(...this.allClasses);
+
+				let dirClass = 'revealer--right'; 
+				let orientation = 'h';
+
+				if ( animationOpts.direction === 'rtl' ) {
+					dirClass = action === 'hide' ? 'revealer--right' : 'revealer--left';
+					orientation = 'h';
+				}
+				else if ( animationOpts.direction === 'ltr' ) {
+					dirClass = action === 'hide' ? 'revealer--left' : 'revealer--right';
+					orientation = 'h';
+				}
+				else if ( animationOpts.direction === 'ttb' ) {
+					dirClass = action === 'hide' ? 'revealer--top' : 'revealer--bottom';
+					orientation = 'v';
+				}
+				else if ( animationOpts.direction === 'btt' ) {
+					dirClass = action === 'hide' ? 'revealer--bottom' : 'revealer--top';
+					orientation = 'v';
+				}
+				target.classList.add(dirClass, orientation === 'h' ? `revealer--${action}X` : `revealer--${action}Y`);
+			}, animationOpts.delay || 0);
+		}
 	}
 
-	TiltObj.prototype.options = {
-		movement: {
-			img : { translation : {x: -40, y: -40} },
-			title : { translation : {x: 20, y: 20} },
-		}
-	};
-
-	TiltObj.prototype._initEvents = function() {
-		this.mouseenterFn = (ev) => {
-			anime.remove(this.DOM.img);
-			anime.remove(this.DOM.title);
-		};
-		
-		this.mousemoveFn = (ev) => {
-			requestAnimationFrame(() => this._layout(ev));
-		};
-		
-		this.mouseleaveFn = (ev) => {
-			requestAnimationFrame(() => {
-				anime({
-					targets: [this.DOM.img, this.DOM.title],
-					duration: 1500,
-					easing: 'easeOutElastic',
-					elasticity: 400,
-					translateX: 0,
-					translateY: 0
-				});
-			});
-		};
-
-		this.el.addEventListener('mousemove', this.mousemoveFn);
-		this.el.addEventListener('mouseleave', this.mouseleaveFn);
-		this.el.addEventListener('mouseenter', this.mouseenterFn);
-	};
-
-	TiltObj.prototype._layout = function(ev) {
-		// Mouse position relative to the document.
-		const mousepos = getMousePos(ev);
-		// Document scrolls.
-		const docScrolls = {left : document.body.scrollLeft + document.documentElement.scrollLeft, top : document.body.scrollTop + document.documentElement.scrollTop};
-		const bounds = this.el.getBoundingClientRect();
-		// Mouse position relative to the main element (this.DOM.el).
-		const relmousepos = { x : mousepos.x - bounds.left - docScrolls.left, y : mousepos.y - bounds.top - docScrolls.top };
-
-		// Movement settings for the animatable elements.
-		const t = {
-			img: this.options.movement.img.translation,
-			title: this.options.movement.title.translation,
-		};
-			
-		const transforms = {
-			img : {
-				x: (-1*t.img.x - t.img.x)/bounds.width*relmousepos.x + t.img.x,
-				y: (-1*t.img.y - t.img.y)/bounds.height*relmousepos.y + t.img.y
-			},
-			title : {
-				x: (-1*t.title.x - t.title.x)/bounds.width*relmousepos.x + t.title.x,
-				y: (-1*t.title.y - t.title.y)/bounds.height*relmousepos.y + t.title.y
-			}
-		};
-		this.DOM.img.style.WebkitTransform = this.DOM.img.style.transform = 'translateX(' + transforms.img.x + 'px) translateY(' + transforms.img.y + 'px)';
-		this.DOM.title.style.WebkitTransform = this.DOM.title.style.transform = 'translateX(' + transforms.title.x + 'px) translateY(' + transforms.title.y + 'px)';
-	};
-
-	
-	const shapes = [
-		{
-			path: 'M 262.9,252.2 C 210.1,338.2 212.6,487.6 288.8,553.9 372.2,626.5 511.2,517.8 620.3,536.3 750.6,558.4 860.3,723 987.3,686.5 1089,657.3 1168,534.7 1173,429.2 1178,313.7 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
-			pathAlt: 'M 262.9,252.2 C 210.1,338.2 273.3,400.5 298.5,520 323.7,639.6 511.2,537.2 620.3,555.7 750.6,577.8 872.2,707.4 987.3,686.5 1102,665.6 1218,547.8 1173,429.2 1128,310.6 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
-			scaleX: 1.3,
-			scaleY: 1.8,
-			rotate: 70,
-			tx: 0,
-			ty: -100,
-			fill: {
-				color: '#342560',
-				duration: 500,
-				easing: 'linear'
-			},
-			animation: {
-				path: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				},
-				svg: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				}
-			}
-		},
-		{
-			path: 'M 415.6,206.3 C 407.4,286.6 438.1,373.6 496.2,454.8 554.3,536.1 497,597.2 579.7,685.7 662.4,774.1 834.3,731.7 898.5,653.4 962.3,575 967.1,486 937.7,370 909.3,253.9 937.7,201.5 833.4,105.4 729.3,9.338 602.2,13.73 530.6,41.91 459,70.08 423.9,126.1 415.6,206.3 Z',
-			pathAlt: 'M 415.6,206.3 C 407.4,286.6 415.5,381.7 473.6,462.9 531.7,544.2 482.5,637.6 579.7,685.7 676.9,733.8 826.2,710.7 890.4,632.4 954.2,554 926.8,487.6 937.7,370 948.6,252.4 937.7,201.5 833.4,105.4 729.3,9.338 602.2,13.73 530.6,41.91 459,70.08 423.9,126.1 415.6,206.3 Z',
-			scaleX: 1.9,
-			scaleY: 1,
-			rotate: 0,
-			tx: 0,
-			ty: 100,
-			fill: {
-				color: '#d65640',
-				duration: 500,
-				easing: 'linear'
-			},
-			animation: {
-				path: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				},
-				svg: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				}
-			}
-		},
-		{
-			path: 'M 383.8,163.4 C 335.8,352.3 591.6,317.1 608.7,420.8 625.8,524.5 580.5,626 647.3,688 714,750 837.1,760.5 940.9,661.5 1044,562.3 1041,455.8 975.8,393.6 909.8,331.5 854.2,365.4 784.4,328.1 714.6,290.8 771.9,245.2 733.1,132.4 694.2,19.52 431.9,-25.48 383.8,163.4 Z',
-			pathAlt: 'M 383.8,163.4 C 345.5,324.9 591.6,317.1 608.7,420.8 625.8,524.5 595.1,597 647.3,688 699.5,779 837.1,760.5 940.9,661.5 1044,562.3 1068,444.4 975.8,393.6 884,342.8 854.2,365.4 784.4,328.1 714.6,290.8 820.3,237.2 733.1,132.4 645.9,27.62 422.1,1.919 383.8,163.4 Z',
-			scaleX: 1.9,
-			scaleY: 1.1,
-			rotate: 40,
-			tx: -100,
-			ty: 200,
-			fill: {
-				color: '#bfb37c',
-				duration: 500,
-				easing: 'linear'
-			},
-			animation: {
-				path: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				},
-				svg: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				}
-			}
-		},
-		{
-			path: 'M 262.9,252.2 C 210.1,338.2 212.6,487.6 288.8,553.9 372.2,626.5 511.2,517.8 620.3,536.3 750.6,558.4 860.3,723 987.3,686.5 1089,657.3 1168,534.7 1173,429.2 1178,313.7 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
-			pathAlt: 'M 262.9,252.2 C 210.1,338.2 273.3,400.5 298.5,520 323.7,639.6 511.2,537.2 620.3,555.7 750.6,577.8 872.2,707.4 987.3,686.5 1102,665.6 1218,547.8 1173,429.2 1128,310.6 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
-			scaleX: 1.5,
-			scaleY: 2,
-			rotate: -20,
-			tx: 0,
-			ty: -50,
-			fill: {
-				color: '#1e71bf',
-				duration: 500,
-				easing: 'linear'
-			},
-			animation: {
-				path: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				},
-				svg: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				}
-			}
-		},
-		{
-			path: 'M 262.9,252.2 C 210.1,338.2 212.6,487.6 288.8,553.9 372.2,626.5 511.2,517.8 620.3,536.3 750.6,558.4 860.3,723 987.3,686.5 1089,657.3 1168,534.7 1173,429.2 1178,313.7 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
-			pathAlt: 'M 262.9,252.2 C 210.1,338.2 273.3,400.5 298.5,520 323.7,639.6 511.2,537.2 620.3,555.7 750.6,577.8 872.2,707.4 987.3,686.5 1102,665.6 1218,547.8 1173,429.2 1128,310.6 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z',
-			scaleX: 1.3,
-			scaleY: 1,
-			rotate: -70,
-			tx: 0,
-			ty: 150,
-			fill: {
-				color: '#44b7a3',
-				duration: 500,
-				easing: 'linear'
-			},
-			animation: {
-				path: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				},
-				svg: {
-					duration: 1000,
-					easing: 'easeInOutQuad'
-				}
-			}
-		},
-		{
-			path: 'M 415.6,206.3 C 407.4,286.6 438.1,373.6 496.2,454.8 554.3,536.1 497,597.2 579.7,685.7 662.4,774.1 834.3,731.7 898.5,653.4 962.3,575 967.1,486 937.7,370 909.3,253.9 937.7,201.5 833.4,105.4 729.3,9.338 602.2,13.73 530.6,41.91 459,70.08 423.9,126.1 415.6,206.3 Z',
-			pathAlt: 'M 415.6,206.3 C 407.4,286.6 415.5,381.7 473.6,462.9 531.7,544.2 482.5,637.6 579.7,685.7 676.9,733.8 826.2,710.7 890.4,632.4 954.2,554 926.8,487.6 937.7,370 948.6,252.4 937.7,201.5 833.4,105.4 729.3,9.338 602.2,13.73 530.6,41.91 459,70.08 423.9,126.1 415.6,206.3 Z',
-			scaleX: 2,
-			scaleY: 1,
-			rotate: 0,
-			tx: 0,
-			ty: 100,
-			fill: {
-				color: '#4b66b3',
-				duration: 500,
-				easing: 'linear'
-			},
-			animation: {
-				path: {
-					duration: 2000,
-					easing: 'easeOutElastic',
-					elasticity: 400
-				},
-				svg: {
-					duration: 2000,
-					easing: 'easeOutQuad'
-				}
-			}
-		}
-	];
-	let step;
-
-
-    
-
-        
-
-	
-
-	
 
 
 export default class Portfolio extends Component {
-    constructor(props) {
-        super(props)
+	constructor(props) {
+		super(props)
 
-        this.state = {
-            videos: []
-        }
-        const DOM = {};
-        DOM.svg = document.querySelector('.morph');
-        DOM.shapeEl = document.querySelector('.morph_path');
-        DOM.contentElems = Array.from(document.querySelectorAll('.content-wrap'));
-        DOM.contentLinks = Array.from(document.querySelectorAll('.content__link'));
-        DOM.footer = document.querySelector('.content--related');
-        const contentElemsTotal = DOM.contentElems.length;
-    }
-    componentDidMount() {
-        new imagesLoaded(document.body, () => {
-			this.initShapeEl()
-			this.createScrollWatchers()
-			Array.from(document.querySelectorAll('.content--layout')).forEach(el => new TiltObj(el));
-			// Remove loading class from body
-			
-		});
-        console.log(localStorage.getItem('videos'))
-        // this.setState({videos: JSON.parse(localStorage.getItem('videos'))})   
-    }
-    createScrollWatchers() {
-		this.DOM.contentElems.forEach((el,pos) => {
-			const scrollElemToWatch = pos ? this.DOM.contentElems[pos] : this.DOM.footer;
-			pos = pos ? pos : this.contentElemsTotal;
-			const watcher = scrollMonitor.create(scrollElemToWatch,-350);
-			
-			watcher.enterViewport(function() {
-				step = pos;
-				anime.remove(this.DOM.shapeEl);
-				anime({
-					targets: this.DOM.shapeEl,
-					duration: shapes[pos].animation.path.duration,
-					easing: shapes[pos].animation.path.easing,
-					elasticity: shapes[pos].animation.path.elasticity || 0,
-					d: shapes[pos].path,
-					fill: {
-						value: shapes[pos].fill.color,
-						duration: shapes[pos].fill.duration,
-						easing: shapes[pos].fill.easing
-					},
-					complete: function() {
-						this.initShapeLoop(pos);
-					}
-				});
+		this.state = {
+			videos: []
+		}
 
-				anime.remove(this.DOM.svg);
-				anime({
-					targets: this.DOM.svg,
-					duration: shapes[pos].animation.svg.duration,
-					easing: shapes[pos].animation.svg.easing,
-					elasticity: shapes[pos].animation.svg.elasticity || 0,
-					scaleX: shapes[pos].scaleX,
-					scaleY: shapes[pos].scaleY,
-					translateX: shapes[pos].tx+'px',
-					translateY: shapes[pos].ty+'px',
-					rotate: shapes[pos].rotate+'deg'
-				});
-			});
-
-			watcher.exitViewport(function() {
-				const idx = !watcher.isAboveViewport ? pos-1 : pos+1;
-
-				if( idx <= this.contentElemsTotal && step !== idx ) {
-					step = idx;
-					anime.remove(this.DOM.shapeEl);
-					anime({
-						targets: this.DOM.shapeEl,
-						duration: shapes[idx].animation.path.duration,
-						easing: shapes[idx].animation.path.easing,
-						elasticity: shapes[idx].animation.path.elasticity || 0,
-						d: shapes[idx].path,
-						fill: {
-							value: shapes[idx].fill.color,
-							duration: shapes[idx].fill.duration,
-							easing: shapes[idx].fill.easing
-						},
-						complete: function() {
-							this.initShapeLoop(idx);
-						}
-					});
-
-					anime.remove(this.DOM.svg);
-					anime({
-						targets: this.DOM.svg,
-						duration: shapes[idx].animation.svg.duration,
-						easing: shapes[idx].animation.svg.easing,
-						elasticity: shapes[idx].animation.svg.elasticity || 0,
-						scaleX: shapes[idx].scaleX,
-						scaleY: shapes[idx].scaleY,
-						translateX: shapes[idx].tx+'px',
-						translateY: shapes[idx].ty+'px',
-						rotate: shapes[idx].rotate+'deg'
-					});
-				}
-			});
-		});
-    }
-  
-
-    initShapeLoop(pos) {
-		pos = pos || 0;
-		anime.remove(this.DOM.shapeEl);
-		anime({
-			targets: this.DOM.shapeEl,
-			easing: 'linear',
-			d: [{value: shapes[pos].pathAlt, duration:1500}, {value: shapes[pos].path, duration:1500}],
-			loop: true,
-			fill: {
-				value: shapes[pos].fill.color,
-				duration: shapes[pos].fill.duration,
-				easing: shapes[pos].fill.easing
-			},
-			direction: 'alternate'
-		});
-    }
-    initShapeEl() {
-		anime.remove(this.DOM.svg);
-		anime({
-			targets: this.DOM.svg,
-			duration: 1,
-			easing: 'linear',
-			scaleX: shapes[0].scaleX,
-			scaleY: shapes[0].scaleY,
-			translateX: shapes[0].tx+'px',
-			translateY: shapes[0].ty+'px',
-			rotate: shapes[0].rotate+'deg'
-		});
-
-		this.initShapeLoop()
 	}
-    componentWillMount() {
-        
+	componentDidMount() {
+		let grid = document.querySelector('.grid')
+		let item = document.querySelector('.grid__item')
+		
 
-    }
-   
-  
+		let this_revealer = new Revealer(item, 'show')
+		let new_grid = new Grid(grid)
+		let new_grid_item = new GridItem(item)
+		let GRIDS = Array.from(document.querySelectorAll('.grid'));
+		let new_slideShow = new Slideshow(GRIDS, {
+					hasTilt: true,
+					tilt: {maxTranslationX: 25, maxTranslationY: 25}
+				})
 
-    render() {
-        const portfolio_styles = {
-            paddingTop: '100px'
-        }
-        const items = [1,2,3,4]
-        const i = () => {items[Math.floor(Math.random()*items.length)]}
-        const layout =`content content--layout content--layout-${items[Math.floor(Math.random()*items.length)]}`
-        console.log(layout)
-      
-  
-            
-            return (
-                <div className="Portfolio demo-2" style={portfolio_styles}>
-                    <main>
-                    <div className="morph-wrap">
-                        <svg className="morph" width="1400" height="770" viewBox="0 0 1400 770">
-                            <path className="morph_path" d="M 262.9,252.2 C 210.1,338.2 212.6,487.6 288.8,553.9 372.2,626.5 511.2,517.8 620.3,536.3 750.6,558.4 860.3,723 987.3,686.5 1089,657.3 1168,534.7 1173,429.2 1178,313.7 1096,189.1 995.1,130.7 852.1,47.07 658.8,78.95 498.1,119.2 410.7,141.1 322.6,154.8 262.9,252.2 Z"/>
-                        </svg>
-                    </div>
-                        {this.props.videos.map((video) => (
-                            <div className="content-wrap">
-                                <div className={layout}>
-                                    <div className='content__img'>
-                                        <img src={video.pictures ? video.pictures.sizes[2].link : null} />
-                                    </div>
-                                    
-                                    <h3 className="content__title">found</h3>
-                                    <p className="content__author">Jane Westhall</p>
-                                    <p className="content__desc">Lost or found? That's the question today.</p>
-                                    <a href="#" className="content__link">Discover</a>
-                                </div>
-                            </div>
-                        ))}
-                    </main>
-                </div>
-    
-            )
-        } 
-       
-    
+		// new Slideshow(DOM.gridElems, {
+		// 			hasTilt: true,
+		// 			tilt: {maxTranslationX: 25, maxTranslationY: 25}
+		// 		});
+
+		new_grid.show()
+		this_revealer.toggle()
+	}
+
+
+	render() {
+		const portfolio_styles = {
+			paddingTop: '100px',
+			position: 'relative'
+		}
+		const videos = this.props.videos.map(video => {
+			let bg_image
+			if (video.pictures){
+				bg_image =  video.pictures.sizes[2].link
+				return (
+						<div className="grid__item">
+							<img src={bg_image} alt="" />
+						</div>
+					)
+			}
+		})
+		
+
+		return (
+			<div className="Portfolio" style={portfolio_styles}>
+				<div className="grid grid--layout-3" >
+					{videos}
+
+					<h2 className="grid__item grid__item--name">Oyo<br /> Expo <br />2019</h2>
+					<h3 className="grid__item grid__item--title">Paris</h3>
+					<p className="grid__item grid__item--text">Dignified teacakes air one's dirty linen off t'shop scouser quid pezzy little taking the mick</p>
+						
+				</div>
+			</div>
+		)
+	}
+
+
 }
+

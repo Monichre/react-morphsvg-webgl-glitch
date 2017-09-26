@@ -1,5 +1,8 @@
 import React, { Component } from 'react'
 import {BackgroundImage, PostEffect, ConsoleSignature} from './Partials/Glitch'
+import Footer from './Partials/Footer'
+
+
 import * as THREE from 'three';
 import Menu from './Partials/Menu'
 
@@ -101,9 +104,8 @@ const debounce = (callback, duration) => {
 		return (
 			<div className="demo-grid">
 				<div id="Home" className="Home">
-
 					<Menu />
-
+					<Footer />
 				</div>
 			</div>
 		);
