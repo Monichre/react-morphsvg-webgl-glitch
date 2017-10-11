@@ -55,7 +55,7 @@ let center = { x: win.width / 2, y: win.height / 2 };
 class GridItem {
 	constructor(el, options) {
 		this.CONFIG = {
-			filledColor: '#fff'
+			filledColor: 'rgba(0,0,0,0)'
 		};
 		Object.assign(this.CONFIG, options);
 		this.DOM = {};
@@ -382,21 +382,19 @@ export default class Portfolio extends Component {
 					hasTilt: true,
 					tilt: {maxTranslationX: 25, maxTranslationY: 25}
 				})
-
-		// new Slideshow(DOM.gridElems, {
-		// 			hasTilt: true,
-		// 			tilt: {maxTranslationX: 25, maxTranslationY: 25}
-		// 		});
-
+		// this_revealer.show()
 		new_grid.show()
-		this_revealer.toggle()
+		
 	}
 
 
 	render() {
 		const portfolio_styles = {
 			paddingTop: '100px',
-			position: 'relative'
+			// position: 'relative'
+		}
+		const bg_style = {
+			background: 'transparent'
 		}
 		const videos = this.props.videos.map(video => {
 			let bg_image
@@ -412,11 +410,11 @@ export default class Portfolio extends Component {
 		
 
 		return (
-			<div className="Portfolio" style={portfolio_styles}>
-				<div className="grid grid--layout-3" >
+			<div id="Portfolio" style={portfolio_styles}>
+				<div className="grid grid--layout-3">
 					{videos}
 
-					<h2 className="grid__item grid__item--name">Oyo<br /> Expo <br />2019</h2>
+					<h2 className="grid__item grid__item--name" >Oyo<br /> Expo <br />2019</h2>
 					<h3 className="grid__item grid__item--title">Paris</h3>
 					<p className="grid__item grid__item--text">Dignified teacakes air one's dirty linen off t'shop scouser quid pezzy little taking the mick</p>
 						

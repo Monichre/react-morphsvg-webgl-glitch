@@ -1,8 +1,4 @@
 
-
-/* MORPHING ANIMATION */
-
-
 *,
 *::after,
 *::before {
@@ -13,21 +9,13 @@
 body {
 	--text-color: #fff;
 
-	--link-color: #03b9f1;
-	--link-hover-color: #fff;
 	font-family: 'Roboto Mono', monospace;
 	font-weight: 500;
 	color: #fff;
-	color: var(--text-color);
-	background-color: #363dc2;
-	background-color: var(--background-color);
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	
+
 }
 
-#Portfolio {
-	background-image: url(../img/noise.gif);
-}
 .codrops-header {
 	position: relative;
 	z-index: 100;
@@ -69,19 +57,11 @@ body {
 /* PORTFOLIO */
 #Portfolio {
 	/* Grid gap */
-	--gap: 10px;
+	--gap: 20px;
 	/* Color scheme */
 	--body-text: #333;
-	--body-bg: #ccd8e4;
-	--link-text: #ef3b3b;
-	--link-text-hover: #333;
-	--grid-name-text: #ef3b3b;
-	--grid-title-text: #ef3b3b;
-	--grid-nav-text: #fff;
-	--grid-nav-bg: #442ef4;
-	--grid-nav-text-hover: #fff;
-	--grid-nav-bg-hover: #1f1f1f;
-	--grid-text: #333;
+	
+
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 	min-height: 600px;
 	color: #333;
@@ -89,6 +69,31 @@ body {
 	background: #ccd8e4;
 	background: var(--body-bg);
 }
+#Portfolio div.grid__item:not(.grid__item--nav)::after {
+	content: '';
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	background: #0013ff;
+	mix-blend-mode: exclusion;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s;
+	}
+	#Portfolio .revealer--hideX,
+	#Portfolio .revealer--hideY,
+	#Portfolio .revealer--showX,
+	#Portfolio .revealer--showY,
+	#Portfolio .grid__item--animateOut,
+	#Portfolio .grid__item--animateIn {
+	animation-duration: 0.6s;
+	}
+	#Portfolio .grid:not(.grid--animating) div.grid__item:not(.grid__item--nav):hover::after {
+	opacity: 1;
+	}
+	
 
 
 /* REVEALER CSS */
@@ -97,7 +102,7 @@ body {
 position: absolute;
 width: calc(100% + 4px);
 height: calc(100% + 4px); /* Firefox and Safari gap hack */
-background: #fff;
+
 top: -2px;
 left: -2px;
 opacity: 0;
@@ -212,11 +217,17 @@ pointer-events: auto;
 
 .grid__item {
 position: relative;
-padding: 1em;
+
 background-repeat: no-repeat;
 background-position: 50% 50%;
 background-size: cover;
 transition: transform 0.2s ease-out;
+}
+.grid__item img {
+	object-fit: cover;
+	object-position: center;
+	height: 100%;
+	width: 100%;
 }
 
 .grid__item--name,
@@ -327,6 +338,7 @@ to {
 .grid--layout-3 .grid__item:nth-child(9) { grid-area: 20 / 20 / 27 / 24; }
 .grid--layout-3 .grid__item:nth-child(10) { grid-area: 20 / 28 / 25 / 30;  }
 .grid--layout-3 .grid__item:nth-child(11) { grid-area: 4 / 23 / 11 / 27;  }
+.grid--layout-3 .grid__item:nth-child(12) { grid-area: 4 / 23 / 11 / 27;  }
 
 .grid--layout-3 .grid__item--name { grid-area: 15 / 16 / 30 / 23; }
 .grid--layout-3 .grid__item--title { grid-area: 1 / 27 / 11 / 29; }
@@ -334,63 +346,6 @@ to {
 .grid--layout-3 .grid__item--nav-prev { grid-area: 14 / 5 / 19 / 10; }
 .grid--layout-3 .grid__item--nav-next { grid-area: 6 / 18 / 11 / 23; }
 
-/* Demo themes */
-.demo-2 {
---gap: 10px;
---body-text: #333;
---body-bg: #c4f8de;
---link-text: #000000;
---link-text-hover: #727272;
---grid-name-text: #7ed72e;
---grid-title-text: #39c283;
---grid-nav-text: #000;
---grid-nav-bg: #39c283;
---grid-nav-text-hover: #ffffff;
---grid-nav-bg-hover: #000000;
---grid-text: #39c283;
-}
-
-.demo-2 .revealer--hideX,
-.demo-2 .revealer--hideY,
-.demo-2 .revealer--showX,
-.demo-2 .revealer--showY,
-.demo-2 .grid__item--animateOut,
-.demo-2 .grid__item--animateIn {
-animation-duration: 0.6s;
-}
-
-.demo-3 {
---gap: 20px;
---body-text: #d3d9d9;
---body-bg: #252626;
---link-text: #727676;
---link-text-hover: #f95422;
---grid-name-text: #f95422;
---grid-title-text: #1f2ee0;
---grid-nav-text: #000;
---grid-nav-bg: #fffa3a;
---grid-nav-text-hover: #fff;
---grid-nav-bg-hover: #1f2ee0;
---grid-text: #fff;
-}
-
-.demo-3 div.grid__item:not(.grid__item--nav)::after {
-content: '';
-position: absolute;
-width: 100%;
-height: 100%;
-top: 0;
-left: 0;
-background: #0013ff;
-mix-blend-mode: exclusion;
-opacity: 0;
-pointer-events: none;
-transition: opacity 0.3s;
-}
-
-.demo-3 .grid:not(.grid--animating) div.grid__item:not(.grid__item--nav):hover::after {
-opacity: 1;
-}
 
 @media screen and (max-width: 60em) {
 .message {
@@ -430,7 +385,7 @@ opacity: 1;
 }
 
 .grid__item {
-	min-height: 50px;
+	min-height: 75px;
 	grid-area: auto!important;
 }
 

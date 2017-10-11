@@ -52,15 +52,15 @@ a:focus {
 	background-size: auto 100%;
 }
 
-.deco__text {
-	font-size: 2em;
+.About .deco__text {
+	font-size: 1em;
 	line-height: 1;
 	margin: 0;
-	color: #333;
+	color: #dddddd;
 	font-family: 'Fjalla One', sans-serif;
 }
 
-/* Header */
+
 .About .codrops-header {
 	position: relative;
 	display: flex;
@@ -72,7 +72,7 @@ a:focus {
 
 .About .codrops-header__info {
 	font-family: 'Fjalla One', sans-serif;
-	font-size: 5em;
+	font-size: 4em;
 	font-weight: 700;
 	color: #333;
 	position: relative;
@@ -99,7 +99,7 @@ a:focus {
 	font-size: 2em;
 	line-height: 1;
 	padding: 1em 0;
-	color: #1d48f3;
+	
 
 	writing-mode: vertical-rl;
 }
