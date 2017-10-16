@@ -2,8 +2,9 @@ import React, { Component } from 'react'
 import imagesLoaded from 'react-images-loaded'
 import anime from 'animejs'
 import scrollMonitor from 'scrollmonitor'
-import ReactPlayer from 'react-player'
+import Vimeo from 'react-vimeo'
 import classie from 'desandro-classie'
+import MobilePortfolio from './MobilePortfolio'
 
 import '../css/Portfolio.css'
 
@@ -395,19 +396,21 @@ export default class Portfolio extends Component {
 
 
 	allowPlay() {
-		classie.add(this.bodyEl, 'video-loaded');
+		const bodyEl = document.querySelector('body')
+		classie.add(bodyEl, 'video-loaded');
 	}
 
 	play() {
-		
-		classie.remove(this.videoWrap, 'video-wrap--hide');
-		classie.add(this.videoWrap, 'video-wrap--show');
+		const videoWrap = document.querySelector('.video-wrap')
+		classie.remove(videoWrap, 'video-wrap--hide');
+		classie.add(videoWrap, 'video-wrap--show');
 		
 	}
 
 	hide() {
-		classie.remove(this.videoWrap, 'video-wrap--show');
-		classie.add(this.videoWrap, 'video-wrap--hide');
+		const videoWrap = document.querySelector('.video-wrap')
+		classie.remove(videoWrap, 'video-wrap--show');
+		classie.add(videoWrap, 'video-wrap--hide');
 		
 	}
 
@@ -420,6 +423,13 @@ export default class Portfolio extends Component {
 		const bg_style = {
 			background: 'transparent'
 		}
+		const icon_style = {
+			height: '20px',
+			width: '20px',
+			display: 'block',
+			margin: 'auto'
+		}
+		const mobile_videos = this.props.videos.slice(0, 4)
 		const videos = this.props.videos.map(video => {
 			let bg_image
 			if (video.pictures){
@@ -428,16 +438,13 @@ export default class Portfolio extends Component {
 						<div className="grid__item">
 							<div className="video-wrap">
 								<div className="video-inner">
-								<ReactPlayer src={video.uri} className='video' onClick={this.allowPlay.bind(this)}/>
-									<div className="action action--close" onClick={this.hide.bind(this)}><i className="fa fa-close"></i><span className="action__label action__label--hidden">Close preview</span></div>
+									<div className="video-player" dangerouslySetInnerHTML={{__html: video.embed.html}} />
+									<div className="action action--close" onClick={this.hide.bind(this)}><img src="img/icons/close.svg" alt="" style={icon_style}/></div>
 								</div> 
 							</div>
 							<img src={bg_image} alt="" />
-							<div className="loader">
-								<i className="fa fa-spinner fa-pulse"></i>
-							</div>
-							<div className="action action--hidden action--play" onClick={this.play.bind(this)}>
-								
+							<div className="action action--play" onClick={this.play.bind(this)}>
+								<img src="img/icons/play.svg" alt="" style={icon_style}/>
 							</div>
 						</div>
 					)
@@ -449,11 +456,12 @@ export default class Portfolio extends Component {
 			<div id="Portfolio" style={portfolio_styles}>
 				<div className="grid grid--layout-3">
 					{videos}
-					<h2 className="grid__item grid__item--name" >Oyo<br /> Expo <br />2019</h2>
-					<h3 className="grid__item grid__item--title">Paris</h3>
-					<p className="grid__item grid__item--text">Dignified teacakes air one's dirty linen off t'shop scouser quid pezzy little taking the mick</p>
+					<h2 className="grid__item grid__item--name" >The<br /> Latest <br />2017</h2>
+					<h3 className="grid__item grid__item--title">Mpls</h3>
+					<p className="grid__item grid__item--text">Immortalizing little slices of reality</p>
 						
 				</div>
+				
 			</div>
 		)
 	}
