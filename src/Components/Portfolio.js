@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import imagesLoaded from 'react-images-loaded'
 import anime from 'animejs'
 import scrollMonitor from 'scrollmonitor'
+import ReactPlayer from 'react-player'
+import classie from 'desandro-classie'
 
 import '../css/Portfolio.css'
 
@@ -367,13 +369,17 @@ export default class Portfolio extends Component {
 		this.state = {
 			videos: []
 		}
+		const bodyEl = document.querySelector('body')
+		const videoWrap = document.querySelector('.video-wrap')
+		const videoEl = document.querySelector('.video')
+		const playCtrl = document.querySelector('.action--play')
+		const closeCtrl = document.querySelector('.action--close')
 
 	}
 	componentDidMount() {
+		// Grid Logic
 		let grid = document.querySelector('.grid')
 		let item = document.querySelector('.grid__item')
-		
-
 		let this_revealer = new Revealer(item, 'show')
 		let new_grid = new Grid(grid)
 		let new_grid_item = new GridItem(item)
@@ -382,8 +388,26 @@ export default class Portfolio extends Component {
 					hasTilt: true,
 					tilt: {maxTranslationX: 25, maxTranslationY: 25}
 				})
-		// this_revealer.show()
 		new_grid.show()
+		
+	}
+
+
+
+	allowPlay() {
+		classie.add(this.bodyEl, 'video-loaded');
+	}
+
+	play() {
+		
+		classie.remove(this.videoWrap, 'video-wrap--hide');
+		classie.add(this.videoWrap, 'video-wrap--show');
+		
+	}
+
+	hide() {
+		classie.remove(this.videoWrap, 'video-wrap--show');
+		classie.add(this.videoWrap, 'video-wrap--hide');
 		
 	}
 
@@ -402,7 +426,19 @@ export default class Portfolio extends Component {
 				bg_image =  video.pictures.sizes[2].link
 				return (
 						<div className="grid__item">
+							<div className="video-wrap">
+								<div className="video-inner">
+								<ReactPlayer src={video.uri} className='video' onClick={this.allowPlay.bind(this)}/>
+									<div className="action action--close" onClick={this.hide.bind(this)}><i className="fa fa-close"></i><span className="action__label action__label--hidden">Close preview</span></div>
+								</div> 
+							</div>
 							<img src={bg_image} alt="" />
+							<div className="loader">
+								<i className="fa fa-spinner fa-pulse"></i>
+							</div>
+							<div className="action action--hidden action--play" onClick={this.play.bind(this)}>
+								
+							</div>
 						</div>
 					)
 			}
@@ -413,7 +449,6 @@ export default class Portfolio extends Component {
 			<div id="Portfolio" style={portfolio_styles}>
 				<div className="grid grid--layout-3">
 					{videos}
-
 					<h2 className="grid__item grid__item--name" >Oyo<br /> Expo <br />2019</h2>
 					<h3 className="grid__item grid__item--title">Paris</h3>
 					<p className="grid__item grid__item--text">Dignified teacakes air one's dirty linen off t'shop scouser quid pezzy little taking the mick</p>

@@ -15,7 +15,7 @@ export default class Home extends Component {
 	}
 	componentDidMount() {
 
-const debounce = (callback, duration) => {
+	const debounce = (callback, duration) => {
 			var timer;
 			return function (event) {
 				clearTimeout(timer);
@@ -26,8 +26,6 @@ const debounce = (callback, duration) => {
 		};
 	
 		
-
-		// const canvas = document.getElementById('Home');
 		const canvas = document.createElement('canvas');
 		const renderer = new THREE.WebGLRenderer({
 			antialias: false,

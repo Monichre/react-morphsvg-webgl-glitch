@@ -5,6 +5,7 @@
   "dependencies": {
     "animejs": "^2.0.2",
     "charming": "^2.0.1",
+    "desandro-classie": "^1.0.1",
     "lodash": "^4.17.4",
     "masonry-layout": "^4.2.0",
     "react": "^15.6.1",
@@ -12,7 +13,7 @@
     "react-iframe": "^1.0.7",
     "react-images-loaded": "^1.0.1",
     "react-owl-carousel2": "^0.2.1",
-    "react-player": "^0.24.4",
+    "react-player": "^0.24.6",
     "react-router-dom": "^4.2.2",
     "react-stonecutter": "^0.3.7",
     "scrollmonitor": "^1.2.3",

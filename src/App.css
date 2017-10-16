@@ -68,26 +68,39 @@ a:focus, .fa {
 	color: #fff;
 }
 
-
-.codrops-header__title {
-	font-size: 3em;
-	padding: 0.75em 0;
-	margin: 0;
-	font-style: uppercase;
-	font-weight: normal;
-	color: #fff!important;
+.site-links {
+	position: relative;
+	
 }
+.social__nav {
+	text-align: left;
+	position: absolute;
+	padding: 0;
+	top: 20px;
+	left: 0;
+	transform: translateX(-110%);
+	transition: all .4s;
+
+}
+.site-links:hover .social__nav, .site-links:focus .social__nav, .site-links:active .social__nav {
+	transform: translateX(110%);
+}
+.social__nav li {
+	display: inline-block;
+	margin: 0 20px;
+}
+.social__nav li a img {
+	height: 20px;
+	width: 20px;
+}
+
 
 .info {
 	color: var(--color-link-hover);
 	margin: 0 0 0 1.25em;
 }
 
-.github {
-	display: inline-block;
-	vertical-align: text-bottom;
-	margin: 0 0 2.5em;
-}
+
 
 .codrops-header__tagline,
 .deco {

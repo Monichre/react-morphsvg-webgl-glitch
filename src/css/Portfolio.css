@@ -413,3 +413,61 @@ to {
 	writing-mode: horizontal-tb;
 }
 }
+
+
+/* VIDEO SHIT */
+.video-wrap {
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-align-items: center;
+	align-items: center;
+}
+
+.video-wrap--show {
+	pointer-events: auto;
+}
+
+.video-inner {
+	position: relative;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	margin: 0 auto;
+	opacity: 0;
+	background: black;
+}
+
+.video-wrap--show .video-inner {
+	opacity: 1;
+}
+
+.video-player {
+	position: absolute;
+	top: 50%;
+	width: 100%;
+	-webkit-transform: translate3d(0,-50%,0);
+	transform: translate3d(0,-50%,0);
+}
+/* Loader */
+.loader {
+	font-size: 2.5em;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	-webkit-transform: translate3d(-50%,-50%,0);
+	transform: translate3d(-50%,-50%,0);
+}
+
+.video-loaded .loader {
+	opacity: 0;
+	pointer-events: none;
+	-webkit-transition: opacity 0.3s;
+	transition: opacity 0.3s;
+}

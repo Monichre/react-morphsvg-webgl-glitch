@@ -8,7 +8,10 @@ export default class Header extends Component {
     }
 
     render() {
-
+        const social_nav_style = {
+            display: 'inline',
+            listStyleType: 'none'
+        }
 
         return (
             <div>
@@ -24,10 +27,23 @@ export default class Header extends Component {
                     </symbol>
                 </svg>
                 <header className="codrops-header">
-                    <div className="codrops-links">
-                        <a className="codrops-icon codrops-icon--prev" href="/" title="">
-                            <h1 className="codrops-header__title">JUD NICHOLS</h1>
-                        </a>
+                    <div className="site-links">
+                        <h1 className="codrops-header__title">JUD NICHOLS</h1>
+                    
+                        <ul className="social__nav" style={social_nav_style}>
+                            <li>
+                                <a href><img src="img/icons/home.svg" alt="" /></a>
+                            </li>
+                            <li>
+                                <a href><img src="img/icons/facebook-circle.svg" alt="" /></a>
+                            </li>
+                            <li>
+                            <a href><img src="img/icons/instagram-circle.svg" alt="" /></a>
+                            </li>
+                            <li>
+                            <a href><img src="img/icons/vimeo-circle.svg" alt="" /></a>
+                            </li>
+                        </ul>
                     </div>
                     
                 </header >  
