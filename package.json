@@ -6,6 +6,7 @@
     "animejs": "^2.0.2",
     "charming": "^2.0.1",
     "desandro-classie": "^1.0.1",
+    "enquire.js": "^2.1.6",
     "lodash": "^4.17.4",
     "masonry-layout": "^4.2.0",
     "react": "^15.6.1",
